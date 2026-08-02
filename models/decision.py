@@ -2,10 +2,10 @@ from sqlalchemy import CheckConstraint,String,Float,Boolean,ForeignKey,JSON
 from sqlalchemy.orm import relationship,Mapped,mapped_column
 from datatime import datetime
 from sqlalchemy.sql import func
-from database import Base,TimeStampMixin
+from database import Base,CreatedAtMixin
 import uuid
 
-class Decision(Base,TimeStampMixin,kw_only=True):
+class Decision(Base,CreatedAtMixin,kw_only=True):
     __tablename__ = "decisions"
 
     __table_args__ = (
@@ -16,7 +16,7 @@ class Decision(Base,TimeStampMixin,kw_only=True):
         )
 
     id:Mapped[uuid.UUID] = mapped_column(primary_key=True,default_factory=uuid.uuid4,init=False)
-    application_id:Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id"),nullable=False,index=True,unique=True,comment="Foreign key to the applications table")
+    application_id:Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id",ondelete="CASCADE"),nullable=False,index=True,unique=True,comment="Foreign key to the applications table")
     score:Mapped[float] = mapped_column(Float,nullable=False,comment="BridgeScore 0-100:>=65 approved, 45-64 conditional approve, <45 decline")
     recommendation:Mapped[str] = mapped_column(String(30),nullable=False,comment="Recommendation based on the score (approve, conditional_approve, decline)")
     approved_amount:Mapped[float] = mapped_column(Float,nullable=False,comment="Calibrated loan amount in NRs — may differ from requested_amount")
