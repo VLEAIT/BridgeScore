@@ -6,7 +6,7 @@ from database import Base,TimeStampMixin
 import uuid
 
 class Application(Base,TimeStampMixin,kw_only=True):
-    __tablename__ = "application"
+    __tablename__ = "applications"
 
     __table_args__ = (
         CheckConstraint("land_area_hectares > 0",name="check_land_area_hectares_positive"),
