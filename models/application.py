@@ -6,7 +6,7 @@ from database import Base,TimeStampMixin
 import uuid
 
 class Application(Base,TimeStampMixin,kw_only=True):
-    __tablename__ = "applications"
+    __tablename__ = "application"
 
     __table_args__ = (
         CheckConstraint("land_area_hectares > 0",name="check_land_area_hectares_positive"),
@@ -35,4 +35,6 @@ class Application(Base,TimeStampMixin,kw_only=True):
     decision:Mapped["Decision"] = relationship("Decision",back_populates="application",uselist=False,init=False,cascade="all, delete-orphan")
     audit_logs:Mapped[list["AuditLog"]] = relationship("AuditLog",back_populates="application",init=False,order_by="AuditLog.created_at",cascade="all, delete-orphan")
 
+    def __repr__(self) -> str:
+        return f"<Application id={self.id} farmer={self.farmer_name} status={self.application_status}>"
 
