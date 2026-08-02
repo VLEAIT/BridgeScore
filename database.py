@@ -18,9 +18,12 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)  
 
-class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), onupdate=func.now(), nullable=False)
+class CreatedAtMixin:
+    created_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), nullable=False,init=False)
+
+class TimeStampMixin(CreatedAtMixin):
+    updated_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), onupdate=func.now(), nullable=False,init=False)
+   
 
 class Base(MappedAsDataclass, declarative_base,kw_only=True):
     pass
