@@ -1,0 +1,1 @@
+from .common import LandType,LandGrade,RemittanceChannel,ApplicationStatus,Recommendation,AgentName
