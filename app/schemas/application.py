@@ -1,7 +1,7 @@
 from pydantic import BaseModel,Field,UUID4,field_validator,Annotated,StringConstraints
 from typing import Optional,List
 from datetime import date,datetime
-from schemas.common import LandType,LandGrade,RemittanceChannel,ApplicationStatus
+from app.schemas.common import LandType,LandGrade,RemittanceChannel,ApplicationStatus
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
