@@ -1,8 +1,8 @@
-from sqlalchemy import Integer,String,Column,DateTime,ForeignKey,CheckConstraint,text
-from sqlalchemy.orm import relationship,Mapped,mapped_column
-from datatime import datetime
+from sqlalchemy import Integer, String, Column, DateTime, ForeignKey, CheckConstraint, Float, Boolean, text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime
 from sqlalchemy.sql import func
-from database import Base,TimeStampMixin
+from database import Base, TimeStampMixin
 import uuid
 
 class Application(Base,TimeStampMixin,kw_only=True):

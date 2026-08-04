@@ -1,8 +1,8 @@
-from sqlalchemy import CheckConstraint,String,Float,Boolean,ForeignKey,JSON
-from sqlalchemy.orm import relationship,Mapped,mapped_column
-from datatime import datetime
+from sqlalchemy import CheckConstraint, String, Float, Boolean, ForeignKey, JSON, Text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime
 from sqlalchemy.sql import func
-from database import Base,CreatedAtMixin
+from database import Base, CreatedAtMixin
 import uuid
 
 class Decision(Base,CreatedAtMixin,kw_only=True):

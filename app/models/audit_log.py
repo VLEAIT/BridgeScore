@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime,ForeignKey,CheckConstraint,Text
-from sqlalchemy.orm import relationship,Mapped,mapped_column
-from datatime import datetime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, CheckConstraint, Text, JSON
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime
 from sqlalchemy.sql import func
-from database import Base,CreatedAtMixin
+from database import Base, CreatedAtMixin
 import uuid
 
 VALID_AGENTS=("DVA","IIA","CSA","CA","OA")
