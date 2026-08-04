@@ -30,14 +30,6 @@ class ApplicationCreate(BaseModel):
             raise ValueError('Consent must be given for data processing')
         return v
 
-    @field_validator('farmer_name',mode='before')
-    @classmethod
-    def farmer_name_must_not_be_blank(cls, v:str)->str:
-        if not v.strip():
-            raise ValueError('Farmer name must not be blank')
-        return v.strip()
-
-
     model_config = {
         "json_schema_extra": {
             "example": {
@@ -55,35 +47,36 @@ class ApplicationCreate(BaseModel):
         }
     }    
 class ApplicationOut(BaseModel):
-    id:UUID4=Field(..., description="Unique identifier for the application")
-    farmer_name: CleanString
-    district: CleanString
-    land_area_hectares: float = Field(..., gt=0, description="Land area in hectares")
-    land_type: LandType = Field(..., description="Type of the land")
-    land_grade: LandGrade = Field(..., description="Grade of the land")
-    coop_income_monthly: Decimal = Field(..., ge=0, description="Monthly income from the cooperative")
-    remittance_channel: RemittanceChannel = Field(default=RemittanceChannel.none, description="Channel through which remittance is received")
-    remittance_monthly:Decimal = Field(default=0.0, ge=0, description="Monthly remittance amount")
-    requested_amount: Decimal = Field(..., gt=0, description="Requested amount for the application")
-    status: ApplicationStatus = Field(default=ApplicationStatus.pending, description="Current status of the application")
-    created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the application was created")
-    updated_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the application was last updated")
-
+    id: UUID4
+    farmer_name: str
+    district: str
+    land_area_hectares: float
+    land_type: LandType
+    land_grade: LandGrade
+    coop_income_monthly: Decimal
+    remittance_channel: RemittanceChannel
+    remittance_monthly: Decimal
+    requested_amount: Decimal
+    status: ApplicationStatus
+    created_at: datetime
+    updated_at: datetime
+    
     decision:Optional["DecisionOut"]=Field(None, description="Decision details if the application has been processed")
     model_config = {"from_attributes": True}
 
 class ApplicationListOut(BaseModel):
-    id:UUID4=Field(..., description="Unique identifier for the application")
-    farmer_name: CleanString
-    district: CleanString
-    status: ApplicationStatus = Field(default=ApplicationStatus.pending, description="Current status of the application")
-    requested_amount: Decimal = Field(..., gt=0, description="Requested amount for the application")
-    created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the application was created")
-   
+    id: UUID4
+    farmer_name: str
+    district: str
+    status: ApplicationStatus
+    requested_amount: Decimal
+    created_at: datetime
     model_config = {"from_attributes": True}   
 
 
+from schemas.decision import DecisionOut
 ApplicationOut.model_rebuild()  
+
 
 
 
