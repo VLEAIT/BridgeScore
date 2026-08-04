@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker,declarative_base,Mapped,MappedAsDataclass
-from datatime import datetime,timezone
+from sqlalchemy.orm import sessionmaker, declarative_base, Mapped, MappedAsDataclass
+from datetime import datetime, timezone
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
 import os
@@ -19,10 +19,10 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)  
 
 class CreatedAtMixin:
-    created_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), nullable=False,init=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False, init=False)
 
 class TimeStampMixin(CreatedAtMixin):
-    updated_at: Mapped[datetime] = mapped_column(Datetime(timezone=True),server_default=func.now(), onupdate=func.now(), nullable=False,init=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, init=False)
    
 
 class Base(MappedAsDataclass, declarative_base,kw_only=True):
