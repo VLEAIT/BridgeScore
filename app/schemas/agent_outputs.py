@@ -63,6 +63,25 @@ class CSAoutput(BaseModel):
     condidence_uppper:float
     notes:str=""
 
+class ComplianceCheck(BaseModel):
+    rule:str
+    passed:bool
+    detail:str=" "
+
+class CAoutput(BaseModel):
+    agent_name:AgentName=AgentName.ca
+    all_checks_passed=bool
+    checks:list[ComplianceCheck]
+    deprived_sector_eligible:bool
+    fraud_flags:list[str]=Field(default_factory=list)
+    cib_check_completed:bool
+    recommended_max_amount_nrs:float
+    notes:str=""
+
+
+    
+
+
 
 
     
