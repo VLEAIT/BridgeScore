@@ -44,7 +44,26 @@ class IIAOutput(BaseModel):
     hundi_detected:bool
     gulf_gap_applied:bool
     notes:str=" "
-    
+
+class ScoreDimension(BaseModel):
+    name:str
+    weight:float=Field(...,ge=0,le=1)
+    raw_value:float
+    weighted_contribution:float
+    nepal_adjustment_applied:bool=False
+    adjustment_note:str=""
+
+class CSAoutput(BaseModel):
+    agent_name:AgentName=AgentName.csa
+    score:float=Field(...,ge=0,le=1) 
+    recommendation:Recommendation
+    dimesions:list[ScoreDimesion]
+    top_factors:list[dict]
+    confidence_lower:float
+    condidence_uppper:float
+    notes:str=""
+
+
 
     
 
