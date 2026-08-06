@@ -23,7 +23,29 @@ class DVAOutout(BaseModel):
     lalpurja_field:LalpurjaFields
     fsv_estimate_nrs:float=Field(...,ge=0,description="Forced Sale Value in NRS")
     collateral_confiedence:float=Field(...,ge=0,le=1)
+    soft_blocks:list[str]=Field(default_factory=list,description="Non-fatal flag e.g. joint family name")
+    hard_blocks:list[str]=Field(default_factory=list,description="Fatal flag that stop  processing")
+    notes:str=" "
 
 
+class IncomeChannel(BaseModel):
+    source:str
+    monthly_amount_nrs:float
+    confidence:float=Field(...,ge=0,le=1)
+    months_of_history:int=0
+    notes:str=""
+
+class IIAOutput(BaseModel):
+    agent_name:AgentName=AgentName.iia
+    channels:list[IncomeChannel]
+    total_monthly_income_nrs:float
+    composite_confidence:float=Field(..., ge=0,le=1)
+    seasonal_varablility_index:float=Field(...,ge=0,le=1,description="0=stable and 1=highly seasonal")
+    hundi_detected:bool
+    gulf_gap_applied:bool
+    notes:str=" "
+    
+
+    
 
 
