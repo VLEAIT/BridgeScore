@@ -78,6 +78,17 @@ class CAoutput(BaseModel):
     recommended_max_amount_nrs:float
     notes:str=""
 
+class OAOutput(BaseModel):
+    agent_name:AgentName=AgentName.oa
+    final_score:float
+    final_recommendation:Recommendation
+    final_amount_nrs:float
+    conditions:list[str]=Field(default_factory=list,description="list of condition for conditonal approve -empty if Approve or Decline ")
+    action_items:list[str]=Field(default_factory=list,description="Actionable steps for Decline - what farmer must do before reapplying")
+    nepali_explantion:str
+    processing_time_seconds:float
+    notes:str=""
+
 
     
 
