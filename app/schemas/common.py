@@ -46,6 +46,13 @@ class AgentName(str, Enum):
     ca = "CA"
     oa = "OA"
 
+class NRBRule(str,Enum):
+    ltv_limit="LTV_LIMIT"
+    deprived_sector="DEPRIVED_SECTOR"
+    cib_clean="CIB_CLEAN"
+    documentaion_tier="DOCUMENTATION_TIER"
+    concessional_rate="CONCESSIONAL_RATE"
+
 
 class APIResponse(BaseModel, Generic[T]):
     success: bool = Field(..., description="Indicates whether the API request was successful or not.")
