@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import Recommendation, AgentName
+from app.schemas.common import Recommendation, AgentName,NRBRule
 
 
 class LalpurjaFields(BaseModel):
@@ -70,9 +70,11 @@ class CSAOutput(BaseModel):
 
 
 class ComplianceCheck(BaseModel):
-    rule: str
+    rule: NRBRule
     passed: bool
     detail: str = " "
+    actual_value=float
+    threshold_value=float
 
 
 class CAOutput(BaseModel):
