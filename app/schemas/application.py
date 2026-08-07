@@ -14,8 +14,10 @@ CleanString = Annotated[str, StringConstraints(strip_whitespace=True, min_length
 
 
 class ApplicationCreate(BaseModel):
+
     farmer_name: CleanString
     district: CleanString
+    citizenship_number:str=Field(...,min_length=6,max_length=14,description="Official citizenship of applicant")
     land_area_hectares: float = Field(..., gt=0, description="Land area in hectares")
     land_type: LandType = Field(..., description="Type of the land")
     land_grade: LandGrade = Field(..., description="Grade of the land")
