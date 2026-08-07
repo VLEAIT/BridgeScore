@@ -1,5 +1,5 @@
-from application import Application
-from decision import Decision
-from audit_log import AuditLog
+from app.models.application import Application
+from app.models.decision import Decision
+from app.models.audit_log import AuditLog
 
 __all__ = ["Application", "Decision", "AuditLog"]
