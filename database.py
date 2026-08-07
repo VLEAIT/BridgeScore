@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base, Mapped, MappedAsDataclass
-from datetime import datetime, timezone
+from sqlalchemy import create_engine, DateTime
+from sqlalchemy.orm import sessionmaker, declarative_base, Mapped, MappedAsDataclass, mapped_column
+from datetime import datetime
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
 import os
