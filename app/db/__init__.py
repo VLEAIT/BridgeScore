@@ -1,1 +1,1 @@
-from app.db.database import CreatedAtMixin,TimeStampMixin,Base
+from app.db.database import CreatedAtMixin,TimeStampMixin,Base,SessionLocal
