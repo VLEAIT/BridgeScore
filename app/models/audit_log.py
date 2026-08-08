@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, CheckConst
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from sqlalchemy.sql import func
-from database import Base, CreatedAtMixin
+from app.db.database import Base, CreatedAtMixin
 import uuid
 
 VALID_AGENTS=("DVA","IIA","CSA","CA","OA")

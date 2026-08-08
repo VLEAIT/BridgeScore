@@ -1,6 +1,6 @@
 from sqlalchemy import CheckConstraint, String, Float, ForeignKey, JSON, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from database import Base, CreatedAtMixin
+from app.db.database import Base, CreatedAtMixin
 import uuid
 
 
