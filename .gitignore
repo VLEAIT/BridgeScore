@@ -1,2 +1,4 @@
 bridgescore/
 .env
+.vscode/
+__pycache__/
