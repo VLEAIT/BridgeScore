@@ -80,6 +80,21 @@ class ApplicationListOut(BaseModel):
     created_at: datetime
     model_config = {"from_attributes": True}
 
+class ApplicationUpdate(BaseModel):
+    coop_income_monthly:Optional[float]=Field(None,ge=0)
+    remittance_monthly:Optional[float]=Field(None,ge=0)
+    remittance_channel:Optional[RemittanceChannel]=None
+    requested_amount:Optional[float]=Field(None,gt=0)
+    model_config={
+        "json_schema_extra":{
+            "example":{
+                "coop_income_monthly":25000,
+                "remittance_monthly":4500,
+                "remittance_channel":"IME",
+                "requested_amount":180000
+            }
+        }
+    }
 
 from app.schemas.decision import DecisionOut  # noqa: E402
 
