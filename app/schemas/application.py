@@ -18,6 +18,7 @@ class ApplicationCreate(BaseModel):
     farmer_name: CleanString
     district: CleanString
     citizenship_number:str=Field(...,min_length=6,max_length=14,description="Official citizenship of applicant")
+    phone_number:str=Field(...,min_length=8,max_length=15,description="Contact number for SMS delivery")
     land_area_hectares: float = Field(..., gt=0, description="Land area in hectares")
     land_type: LandType = Field(..., description="Type of the land")
     land_grade: LandGrade = Field(..., description="Grade of the land")
@@ -56,6 +57,8 @@ class ApplicationOut(BaseModel):
     id: UUID4
     farmer_name: str
     district: str
+    citizenship_number: str
+    phone_number: str
     land_area_hectares: float
     land_type: LandType
     land_grade: LandGrade
@@ -63,6 +66,7 @@ class ApplicationOut(BaseModel):
     remittance_channel: RemittanceChannel
     remittance_monthly: Decimal
     requested_amount: Decimal
+    consent_given: bool
     status: ApplicationStatus
     created_at: datetime
     updated_at: datetime
@@ -81,10 +85,10 @@ class ApplicationListOut(BaseModel):
     model_config = {"from_attributes": True}
 
 class ApplicationUpdate(BaseModel):
-    coop_income_monthly:Optional[float]=Field(None,ge=0)
-    remittance_monthly:Optional[float]=Field(None,ge=0)
+    coop_income_monthly:Optional[Decimal]=Field(None,ge=0)
+    remittance_monthly:Optional[Decimal]=Field(None,ge=0)
     remittance_channel:Optional[RemittanceChannel]=None
-    requested_amount:Optional[float]=Field(None,gt=0)
+    requested_amount:Optional[Decimal]=Field(None,gt=0)
     model_config={
         "json_schema_extra":{
             "example":{
