@@ -9,7 +9,7 @@ T = TypeVar("T")
 class LandType(str, Enum):
     khet = "Khet"
     bari = "Bari"
-    gharbari = "GharBari"
+    gharbari = "Gharbari"
 
 
 class LandGrade(str, Enum):
@@ -23,14 +23,14 @@ class RemittanceChannel(str, Enum):
     ime = "IME"
     prabhu = "Prabhu"
     hundi = "Hundi"
-    none = "None"
+    none_ = "None"
 
 
 class ApplicationStatus(str, Enum):
-    pending = "Pending"
-    processing = "Processing"
-    completed = "Completed"
-    rejected = "Rejected"
+    pending = "pending"
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
 
 
 class Recommendation(str, Enum):
