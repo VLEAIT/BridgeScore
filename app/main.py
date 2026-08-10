@@ -4,10 +4,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.application import router as applications_router
 from app.core.config import settings
-from middleware.logging import LoggingMiddleware
+from app.middleware.logging import LoggingMiddleware
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging,settings.log_level.upper(),logging.INFO),
     format="%(asctime)s-%(name)s-%(levelname)s-%(message)s"
 )
 logger=logging.getLogger("bridgescore")
