@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     production:bool=False
     is_dev_mode:bool=True
     debug:bool=False
+    log_level:str="INFO"
 
     @field_validator("allow_origins",mode="after")
     @classmethod
