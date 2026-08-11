@@ -1,0 +1,73 @@
+{
+    "_metadata":{
+        "description":"District-level FSV multipliers applied to Sarkaari Mool(goverment assesed land value) to correct for systematic undervaluation.Sarkari Mool understates true market value by 3-5x in most districts.Multiplier calibrated from NRB concessional lending data and Nepal agrictultural cenus of 2021/2022",
+        "formula":"FSV = sarkaari_mool * district_multiplier * land_grade_factor * 0.60",
+        "ltv_ratio":0.60,
+        "last_updated":"2026_04",
+        "source":"Calibrated from NSO 2022, NRB Unified Directive 2081, author estimates",
+        "zones":{
+            "terai":"Flatland districts - highest multiplier",
+            "hill":"Hilly districts - medium multiplier",
+            "mountain":"Himalayan districts - lowest multipler"
+        }
+    },
+    "districts":{
+        "Bhaktapur":{
+            "multiplier":1.45,
+            "zone":"hill",
+            "tier":"urban",
+            "notes":"Kathmandu valley -highest land value in Nepal"
+        },
+        "Kathmandu":{
+            "multiplier":1.50,
+            "zone":"hill",
+            "tier":"urban",
+            "notes":"Capital - premium urban land values"
+        },
+        "Lalitpur":{
+            "multiplier":1.40,
+            "zone":"hill",
+            "tier":"urban",
+            "notes":"Kathmandu valley -near capital premium"
+        },
+        "Chitwan":{
+            "multiplier":0.95,
+            "zone":"terai",
+            "tier":"semi_urban",
+            "notes":"Major Terai district - high agricultural productivity"
+        },
+        "Rupandehi":{
+            "multiplier":0.90,
+            "zone":"terai",
+            "tier":"semi_urban",
+            "notes":"Butwal corridor -strong road access"
+        },
+        "Kaski":{
+            "multiplier":0.88,
+            "zone":"hill",
+            "tier":"semi_urban",
+            "notes":"Pokhara urban influence"
+        },
+        "Kavrepalanchok":{
+            "multiplier":0.62,
+            "zone":"hill",
+            "tier":"rural",
+            "notes":"Ramesh's district - moderate hill values, partial road access"
+        },
+        "Dhading":{
+            "multiplier":0.52,
+            "zone":"hill",
+            "tier":"rural",
+            "notes":"Mixed accesibility - Sita and Ganga's district"
+        },
+        "Surkhet":{
+            "multiplier":0.68,
+            "zone":"hill",
+            "tier":"semi_urban",
+            "notes":"Karnali province capital - growing urban influence"
+        }
+
+
+
+    }
+}
