@@ -13,7 +13,10 @@ router=APIRouter(prefix="/applications",tags=["Applications"])
 
 @router.post("/",response_model=APIResponse[ApplicationOut],status_code=status.HTTP_201_CREATED,summary="Submit a new loan application",description="Accepts farmer data,validates consent,writes to DB.Triggers agent pipline")
 def create_application(payload:ApplicationCreate,db:DatabaseSession)->APIResponse[ApplicationOut]:
-    existing=db.query(Application).filter(Application.citizenship_number==payload.citizenship_number,Application.status.in_(["pending","processing"])).first()
+    existing=db.query(Application).filter(
+        Application.citizenship_number == payload.citizenship_number,
+        Application.status.in_([ApplicationStatus.pending.value, ApplicationStatus.processing.value]),
+    ).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -65,11 +68,11 @@ def reapply(application_id:uuid.UUID,payload:ApplicationUpdate,db:DatabaseSessio
     original=db.query(Application).filter(Application.id==application_id).first()
     if not original:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Application not found")
-    if original.status !="failed":
+    if original.status != ApplicationStatus.failed.value:
         raise HTTPException(
             status_code=400,
             detail="Only declined application can be reapplied"
-        )    
+        )
     original_data={
         "farmer_name":original.farmer_name,
         "district":original.district,
@@ -106,8 +109,8 @@ def update_application(application_id:uuid.UUID,payload:ApplicationUpdate,db:Dat
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Application not found")
      updated_fields=payload.model_dump(exclude_unset=True,mode="json")
      for field,value in updated_fields.items():
-        setattr(application,field,value) 
-     application.status="pending"
+        setattr(application,field,value)
+     application.status=ApplicationStatus.pending.value
      db.commit()
      db.refresh(application)
 
