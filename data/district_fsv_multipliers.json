@@ -1,73 +1,268 @@
 {
-    "_metadata":{
-        "description":"District-level FSV multipliers applied to Sarkaari Mool(goverment assesed land value) to correct for systematic undervaluation.Sarkari Mool understates true market value by 3-5x in most districts.Multiplier calibrated from NRB concessional lending data and Nepal agrictultural cenus of 2021/2022",
-        "formula":"FSV = sarkaari_mool * district_multiplier * land_grade_factor * 0.60",
-        "ltv_ratio":0.60,
-        "last_updated":"2026_04",
-        "source":"Calibrated from NSO 2022, NRB Unified Directive 2081, author estimates",
-        "zones":{
-            "terai":"Flatland districts - highest multiplier",
-            "hill":"Hilly districts - medium multiplier",
-            "mountain":"Himalayan districts - lowest multipler"
-        }
-    },
-    "districts":{
-        "Bhaktapur":{
-            "multiplier":1.45,
-            "zone":"hill",
-            "tier":"urban",
-            "notes":"Kathmandu valley -highest land value in Nepal"
-        },
-        "Kathmandu":{
-            "multiplier":1.50,
-            "zone":"hill",
-            "tier":"urban",
-            "notes":"Capital - premium urban land values"
-        },
-        "Lalitpur":{
-            "multiplier":1.40,
-            "zone":"hill",
-            "tier":"urban",
-            "notes":"Kathmandu valley -near capital premium"
-        },
-        "Chitwan":{
-            "multiplier":0.95,
-            "zone":"terai",
-            "tier":"semi_urban",
-            "notes":"Major Terai district - high agricultural productivity"
-        },
-        "Rupandehi":{
-            "multiplier":0.90,
-            "zone":"terai",
-            "tier":"semi_urban",
-            "notes":"Butwal corridor -strong road access"
-        },
-        "Kaski":{
-            "multiplier":0.88,
-            "zone":"hill",
-            "tier":"semi_urban",
-            "notes":"Pokhara urban influence"
-        },
-        "Kavrepalanchok":{
-            "multiplier":0.62,
-            "zone":"hill",
-            "tier":"rural",
-            "notes":"Ramesh's district - moderate hill values, partial road access"
-        },
-        "Dhading":{
-            "multiplier":0.52,
-            "zone":"hill",
-            "tier":"rural",
-            "notes":"Mixed accesibility - Sita and Ganga's district"
-        },
-        "Surkhet":{
-            "multiplier":0.68,
-            "zone":"hill",
-            "tier":"semi_urban",
-            "notes":"Karnali province capital - growing urban influence"
-        }
-
-
-
+  "_metadata": {
+    "description": "District-level FSV multipliers applied to Sarkaari Mool (government assessed land value) to correct for systematic undervaluation. Sarkaari Mool understates true market value by 3-5x in most districts. Multiplier calibrated from NRB concessional lending data and Nepal agricultural census 2021/22.",
+    "formula": "FSV = sarkaari_mool * district_multiplier * land_grade_factor * 0.60",
+    "ltv_ratio": 0.60,
+    "last_updated": "2026-04",
+    "source": "Calibrated from NSO 2022, NRB Unified Directive 2081, author estimates",
+    "zones": {
+      "terai": "Flatland districts — highest multiplier",
+      "hill": "Hilly districts — medium multiplier",
+      "mountain": "Himalayan districts — lowest multiplier"
     }
+  },
+  "districts": {
+    "Bhaktapur": {
+      "multiplier": 1.45,
+      "zone": "hill",
+      "tier": "urban",
+      "notes": "Kathmandu valley — highest land values in Nepal"
+    },
+    "Kathmandu": {
+      "multiplier": 1.50,
+      "zone": "hill",
+      "tier": "urban",
+      "notes": "Capital — premium urban land values"
+    },
+    "Lalitpur": {
+      "multiplier": 1.40,
+      "zone": "hill",
+      "tier": "urban",
+      "notes": "Kathmandu valley — near capital premium"
+    },
+    "Chitwan": {
+      "multiplier": 0.95,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Major Terai district — high agricultural productivity"
+    },
+    "Rupandehi": {
+      "multiplier": 0.90,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Butwal corridor — strong road access"
+    },
+    "Kaski": {
+      "multiplier": 0.88,
+      "zone": "hill",
+      "tier": "semi_urban",
+      "notes": "Pokhara urban influence"
+    },
+    "Kavrepalanchok": {
+      "multiplier": 0.62,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Ramesh's district — moderate hill values, partial road access"
+    },
+    "Dhading": {
+      "multiplier": 0.52,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Mixed accessibility — Sita and Ganga's district"
+    },
+    "Surkhet": {
+      "multiplier": 0.68,
+      "zone": "hill",
+      "tier": "semi_urban",
+      "notes": "Karnali province capital — growing urban influence"
+    },
+    "Banke": {
+      "multiplier": 0.82,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Nepalgunj corridor"
+    },
+    "Bara": {
+      "multiplier": 0.78,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Productive Terai farmland"
+    },
+    "Parsa": {
+      "multiplier": 0.75,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Birgunj corridor — trade route premium"
+    },
+    "Morang": {
+      "multiplier": 0.80,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Biratnagar influence"
+    },
+    "Sunsari": {
+      "multiplier": 0.77,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Industrial corridor Terai"
+    },
+    "Jhapa": {
+      "multiplier": 0.85,
+      "zone": "terai",
+      "tier": "semi_urban",
+      "notes": "Eastern Terai — tea and agriculture"
+    },
+    "Makwanpur": {
+      "multiplier": 0.58,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Hetauda corridor — moderate hill access"
+    },
+    "Sindhupalchok": {
+      "multiplier": 0.42,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Remote hill district — earthquake affected"
+    },
+    "Dolakha": {
+      "multiplier": 0.38,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Remote eastern hills"
+    },
+    "Solukhumbu": {
+      "multiplier": 0.32,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "Everest region — tourism premium but agricultural land low value"
+    },
+    "Mustang": {
+      "multiplier": 0.28,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "High altitude — very limited agricultural utility"
+    },
+    "Humla": {
+      "multiplier": 0.22,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "Most remote district — lowest land values"
+    },
+    "Mugu": {
+      "multiplier": 0.24,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "Karnali remote mountain"
+    },
+    "Dolpa": {
+      "multiplier": 0.25,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "High Himalayan — minimal agricultural land"
+    },
+    "Karnali": {
+      "multiplier": 0.35,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "Maya's district — remote Karnali"
+    },
+    "Rolpa": {
+      "multiplier": 0.40,
+      "zone": "hill",
+      "tier": "remote",
+      "notes": "Mid-western hills — limited road access"
+    },
+    "Rukum": {
+      "multiplier": 0.38,
+      "zone": "hill",
+      "tier": "remote",
+      "notes": "Remote mid-western"
+    },
+    "Palpa": {
+      "multiplier": 0.55,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Tansen corridor"
+    },
+    "Gulmi": {
+      "multiplier": 0.48,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Western hills — high remittance household density"
+    },
+    "Syangja": {
+      "multiplier": 0.50,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Western hills"
+    },
+    "Nawalpur": {
+      "multiplier": 0.72,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Inner Terai — productive farmland"
+    },
+    "Kapilvastu": {
+      "multiplier": 0.70,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Western Terai"
+    },
+    "Dang": {
+      "multiplier": 0.65,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Inner Terai valley — Hari's Surkhet adjacent"
+    },
+    "Bardiya": {
+      "multiplier": 0.73,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Western Terai — productive agricultural land"
+    },
+    "Kanchanpur": {
+      "multiplier": 0.76,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Far western Terai"
+    },
+    "Kailali": {
+      "multiplier": 0.74,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Dhangadhi corridor"
+    },
+    "default_hill": {
+      "multiplier": 0.45,
+      "zone": "hill",
+      "tier": "rural",
+      "notes": "Fallback for unrecognized hill districts"
+    },
+    "default_terai": {
+      "multiplier": 0.75,
+      "zone": "terai",
+      "tier": "rural",
+      "notes": "Fallback for unrecognized terai districts"
+    },
+    "default_mountain": {
+      "multiplier": 0.28,
+      "zone": "mountain",
+      "tier": "remote",
+      "notes": "Fallback for unrecognized mountain districts"
+    }
+  },
+  "land_grade_factors": {
+    "Aabal": 1.00,
+    "Doyam": 0.75,
+    "Sim": 0.50,
+    "Chahar": 0.30
+  },
+  "district_tiers": {
+    "urban": {
+      "sarkaari_mool_per_hectare_nrs": 2000000,
+      "description": "Major city centers — Kathmandu valley, Pokhara, Biratnagar"
+    },
+    "semi_urban": {
+      "sarkaari_mool_per_hectare_nrs": 800000,
+      "description": "District headquarters and highway corridors"
+    },
+    "rural": {
+      "sarkaari_mool_per_hectare_nrs": 300000,
+      "description": "Village municipalities with road access"
+    },
+    "remote": {
+      "sarkaari_mool_per_hectare_nrs": 80000,
+      "description": "Rural municipalities with limited road access"
+    }
+  }
 }
