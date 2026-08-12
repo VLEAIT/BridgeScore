@@ -51,6 +51,27 @@ def score_collateral_strength(fsv:float,requested_amount:float,zone:str)->float:
     return max(0.0, round(base - zone_discount.get(zone,0.05),4))
 
 
-def score_income_regularity(
-    remittance_monthly:float,
-)    
+def score_income_regularity(remittance_monthly:float,remittance_months_history:int,remittacne_gap_months:int,hundi:bool,coop_income_monthly:flaot,)->float:
+    if remittance_monthly ==0:
+        if coop_income_monthly>=30000:
+            return 0.70
+        elif coop_income_monthly >= 15000:
+            return 0.50
+        else:
+            return 0.30
+    if hundi:
+        return HUNDI_CONFIDENCE_DISCOUNT +0.10
+    gap_forgiven =remittance_gap_monthly <= GULF_GAP_TOLERANCE_MONTHS
+    if  remittance_months_history >= 12  and remittance_gap_months==0:
+        return 1.0
+    elif remittance_months_history >=6 and gap_forgiven:
+        return 0.80
+    elif remittance_months_history>=3 and gap_forgiven:
+        return 0.60
+    elif remittance_months_history >=1:
+        return 0.40
+    else:
+        return 0.20
+                        
+
+
