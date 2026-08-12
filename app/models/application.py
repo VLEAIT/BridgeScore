@@ -16,10 +16,10 @@ class Application(Base, TimeStampMixin, kw_only=True):
         CheckConstraint("coop_income_monthly >= 0", name="check_coop_income_monthly_positive"),
         CheckConstraint("remittance_monthly >= 0", name="check_remittance_monthly_positive"),
         CheckConstraint("requested_amount > 0", name="check_requested_amount_positive"),
-        CheckConstraint("land_type IN ('Khet','Bari','GharBari')", name="ck_application_land_type_valid"),
+        CheckConstraint("land_type IN ('Khet','Bari','Gharbari')", name="ck_application_land_type_valid"),
         CheckConstraint("land_grade IN ('Aabal','Doyam','Sim','Chahar')", name="ck_application_land_grade_valid"),
         CheckConstraint("remittance_channel IN ('IME','Prabhu','Hundi','None')", name="ck_application_remittance_channel_valid"),
-        CheckConstraint("application_status IN ('Pending','Processing','Completed','Rejected')", name="ck_application_status_valid"),
+        CheckConstraint("status IN ('pending','processing','completed','failed')", name="ck_application_status_valid"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default_factory=uuid.uuid4, init=False)
@@ -37,7 +37,7 @@ class Application(Base, TimeStampMixin, kw_only=True):
     lalpurja_data:Mapped[Optional[Dict[str,Any]]]=mapped_column(JSONB,nullable=True,default=None,comment="Structured fields extracted from lalpurja by DVA-kitta,owner,area,grade")
     lalpurja_image_path:Mapped[Optional[str]]=mapped_column(String(255),nullable=True,default=None,comment="File path of uploaded lalpurja image processed by DVA ")
     consent_given: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, comment="Whether the user has given consent for data processing")
-    status: Mapped[str] = mapped_column(String(20), index=True, nullable=False, default="Pending", comment="Status of the application (Pending, Processing, Completed, Rejected)")
+    status: Mapped[str] = mapped_column(String(20), index=True, nullable=False, default="pending", comment="Status of the application (Pending, Processing, Completed, Rejected)")
 
     decision: Mapped["Decision"] = relationship("Decision", back_populates="application", uselist=False, init=False, cascade="all, delete-orphan")
     audit_logs: Mapped[list["AuditLog"]] = relationship("AuditLog", back_populates="application", init=False, order_by="AuditLog.created_at", cascade="all, delete-orphan")
