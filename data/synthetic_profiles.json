@@ -1,0 +1,367 @@
+{
+  "_metadata": {
+    "description": "Ground truth anchor profiles for BridgeScore synthetic validation. All 6 profiles drawn directly from paper Section 4.2. These are the canonical test cases — every model change must reproduce these scores within ±3 points.",
+    "source": "BridgeScore research paper — Vision Thapa, April 2026",
+    "score_thresholds": {
+      "approve": ">=65",
+      "conditional_approve": "45-64",
+      "decline": "<45"
+    },
+    "loan_ceiling_rule": "min(50% of FSV, 12x monthly income)",
+    "hundi_confidence_discount": 0.35,
+    "gulf_gap_tolerance_months": 3
+  },
+  "profiles": [
+    {
+      "id": "ramesh_kavre",
+      "farmer_name": "Ramesh",
+      "district": "Kavrepalanchok",
+      "zone": "hill",
+
+      "land": {
+        "land_area_hectares": 0.5,
+        "land_type": "Khet",
+        "land_grade": "Aabal",
+        "sarkaari_mool_nrs": 516129,
+        "malpot_verified": true,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 18000,
+        "coop_verified": true,
+        "remittance_monthly_nrs": 40000,
+        "remittance_channel": "IME",
+        "remittance_months_history": 6,
+        "remittance_gap_months": 1,
+        "hundi": false,
+        "hundi_proxy_signals": []
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": false
+      },
+
+      "application": {
+        "requested_amount_nrs": 200000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 320000,
+        "max_loan_nrs": 192000,
+        "score": 71,
+        "decision": "Conditional Approve",
+        "approved_amount_nrs": 180000,
+        "condition": "Submit cooperative membership certificate",
+        "top_factors": [
+          "income_regularity",
+          "collateral_strength",
+          "income_sufficiency"
+        ],
+        "processing_time_seconds": 47,
+        "nepali_sms": "Tapainko aavedan swikar gariyeko chha. Cooperative sadasyata praman pathra pathaunu hos."
+      },
+
+      "notes": "Primary canonical test case from paper. Gulf gap tolerance applied for 1 month gap in IME history. Conditional on cooperative membership certificate only."
+    },
+
+    {
+      "id": "sita_dhading",
+      "farmer_name": "Sita",
+      "district": "Dhading",
+      "zone": "hill",
+
+      "land": {
+        "land_area_hectares": 0.3,
+        "land_type": "Bari",
+        "land_grade": "Doyam",
+        "sarkaari_mool_nrs": 280000,
+        "malpot_verified": true,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 9000,
+        "coop_verified": true,
+        "remittance_monthly_nrs": 25000,
+        "remittance_channel": "Hundi",
+        "remittance_months_history": 0,
+        "remittance_gap_months": 0,
+        "hundi": true,
+        "hundi_proxy_signals": [
+          "esewa_transactions",
+          "mobile_recharge_patterns",
+          "cooperative_input_purchases"
+        ]
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": true
+      },
+
+      "application": {
+        "requested_amount_nrs": 150000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 109200,
+        "max_loan_nrs": 65520,
+        "score": 54,
+        "decision": "Conditional Approve",
+        "approved_amount_nrs": 65000,
+        "condition": "Provide 6 months formal remittance history via IME or Prabhu",
+        "top_factors": [
+          "income_regularity",
+          "collateral_strength",
+          "debt_signal"
+        ],
+        "processing_time_seconds": 52,
+        "nepali_sms": "Tapainko aavedan sartaharoo sahit swikar gariyeko chha. Auphacharik remittance itihas pathaunu hos."
+      },
+
+      "notes": "Hundi-dependent household. 35% confidence discount applied to remittance. Proxy spending signals corroborate income. Microfinance membership recognized as positive debt signal."
+    },
+
+    {
+      "id": "hari_surkhet",
+      "farmer_name": "Hari",
+      "district": "Surkhet",
+      "zone": "hill",
+
+      "land": {
+        "land_area_hectares": 1.2,
+        "land_type": "Khet",
+        "land_grade": "Aabal",
+        "sarkaari_mool_nrs": 720000,
+        "malpot_verified": true,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 32000,
+        "coop_verified": true,
+        "remittance_monthly_nrs": 0,
+        "remittance_channel": "None",
+        "remittance_months_history": 0,
+        "remittance_gap_months": 0,
+        "hundi": false,
+        "hundi_proxy_signals": []
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": false
+      },
+
+      "application": {
+        "requested_amount_nrs": 300000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 489600,
+        "max_loan_nrs": 293760,
+        "score": 63,
+        "decision": "Approve",
+        "approved_amount_nrs": 293000,
+        "condition": null,
+        "top_factors": [
+          "collateral_strength",
+          "income_sufficiency",
+          "income_regularity"
+        ],
+        "processing_time_seconds": 38,
+        "nepali_sms": "Tapainko aavedan swikrit bhayo. Rin rashi NRs 2,93,000 paune hunuhuncha."
+      },
+
+      "notes": "Strong cooperative income, no remittance. Large landholding compensates. Score just below 65 Approve threshold — paper lists as Approve so threshold may be inclusive of 63."
+    },
+
+    {
+      "id": "maya_karnali",
+      "farmer_name": "Maya",
+      "district": "Karnali",
+      "zone": "mountain",
+
+      "land": {
+        "land_area_hectares": 0.2,
+        "land_type": "Bari",
+        "land_grade": "Sim",
+        "sarkaari_mool_nrs": 48000,
+        "malpot_verified": false,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 4500,
+        "coop_verified": false,
+        "remittance_monthly_nrs": 12000,
+        "remittance_channel": "Hundi",
+        "remittance_months_history": 0,
+        "remittance_gap_months": 0,
+        "hundi": true,
+        "hundi_proxy_signals": [
+          "mobile_recharge_patterns"
+        ]
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": false
+      },
+
+      "application": {
+        "requested_amount_nrs": 100000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 8400,
+        "max_loan_nrs": 5040,
+        "score": 38,
+        "decision": "Decline",
+        "approved_amount_nrs": 0,
+        "condition": null,
+        "action_items": [
+          "Establish 6 months formal remittance channel (IME or Prabhu)",
+          "Get cooperative membership verified digitally",
+          "Reapply after 3 months with updated income documentation"
+        ],
+        "top_factors": [
+          "collateral_strength",
+          "income_regularity",
+          "income_sufficiency"
+        ],
+        "processing_time_seconds": 44,
+        "nepali_sms": "Tapainko aavedan ahal bela ko lagi asvikrit bhayo. Kripaya 3 mahina pachhi puna aavedan garnu hos."
+      },
+
+      "notes": "Remote Karnali district — lowest FSV multiplier. Malpot unverified — confidence penalty applied. Hundi only with minimal proxy signals. Small Bari Sim grade land insufficient collateral."
+    },
+
+    {
+      "id": "bir_chitwan",
+      "farmer_name": "Bir",
+      "district": "Chitwan",
+      "zone": "terai",
+
+      "land": {
+        "land_area_hectares": 0.8,
+        "land_type": "Khet",
+        "land_grade": "Aabal",
+        "sarkaari_mool_nrs": 1200000,
+        "malpot_verified": true,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 28000,
+        "coop_verified": true,
+        "remittance_monthly_nrs": 55000,
+        "remittance_channel": "Prabhu",
+        "remittance_months_history": 12,
+        "remittance_gap_months": 0,
+        "hundi": false,
+        "hundi_proxy_signals": []
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": false
+      },
+
+      "application": {
+        "requested_amount_nrs": 400000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 1140000,
+        "max_loan_nrs": 684000,
+        "score": 84,
+        "decision": "Approve",
+        "approved_amount_nrs": 400000,
+        "condition": null,
+        "top_factors": [
+          "income_regularity",
+          "collateral_strength",
+          "income_sufficiency"
+        ],
+        "processing_time_seconds": 35,
+        "nepali_sms": "Tapainko aavedan swikrit bhayo. Rin rashi NRs 4,00,000 paune hunuhuncha."
+      },
+
+      "notes": "Strongest profile. 12 months Prabhu history, zero gaps. Chitwan Terai Khet Aabal — highest value land type. Requested amount approved in full as it is well within FSV ceiling."
+    },
+
+    {
+      "id": "ganga_dhading",
+      "farmer_name": "Ganga",
+      "district": "Dhading",
+      "zone": "hill",
+
+      "land": {
+        "land_area_hectares": 0.4,
+        "land_type": "Bari",
+        "land_grade": "Doyam",
+        "sarkaari_mool_nrs": 220000,
+        "malpot_verified": true,
+        "existing_mortgage": false
+      },
+
+      "income": {
+        "coop_income_monthly_nrs": 7000,
+        "coop_verified": true,
+        "remittance_monthly_nrs": 30000,
+        "remittance_channel": "IME",
+        "remittance_months_history": 4,
+        "remittance_gap_months": 2,
+        "hundi": false,
+        "hundi_proxy_signals": [],
+        "remittance_irregular": true
+      },
+
+      "credit": {
+        "cib_clean": true,
+        "existing_loans_nrs": 0,
+        "microfinance_member": false
+      },
+
+      "application": {
+        "requested_amount_nrs": 180000,
+        "consent_given": true
+      },
+
+      "expected": {
+        "fsv_nrs": 85800,
+        "max_loan_nrs": 51480,
+        "score": 49,
+        "decision": "Decline",
+        "approved_amount_nrs": 0,
+        "condition": null,
+        "action_items": [
+          "Establish consistent 6 month remittance history with no gaps beyond 3 months",
+          "Reapply in 3 months once remittance regularity is established"
+        ],
+        "top_factors": [
+          "income_regularity",
+          "collateral_strength",
+          "income_sufficiency"
+        ],
+        "processing_time_seconds": 41,
+        "nepali_sms": "Tapainko aavedan ahal bela ko lagi asvikrit bhayo. 3 mahina pachhi niyamit remittance itihas saath puna aavedan garnu hos."
+      },
+
+      "notes": "Irregular IME history — 2 month gap exceeds gulf tolerance of 3 months but combined with only 4 months history makes income regularity score low. Paper marks as Decline — reapply in 3 months. Score 49 is just above Conditional Approve floor of 45."
+    }
+  ]
+}
