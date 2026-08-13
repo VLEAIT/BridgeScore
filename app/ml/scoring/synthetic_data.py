@@ -1,14 +1,14 @@
 import json
 import logging
 import random
-from decimal import decimal
+from decimal import Decimal
 from pathlib import Path
-from typinh import Any
+from typing import Any
 
 
 from app.ml.fsv import FSVCalculator
 
-logger =logging.getLogger("bridgescore.ml.synthetic_data")
+logger = logging.getLogger("bridgescore.ml.synthetic_data")
 
 ROOT=Path(__file__).resolve().parents[3]
 DATA_DIR=ROOT / "data"
@@ -17,7 +17,7 @@ OUTPUT_PATH=DATA_DIR / "synthetic_training_data.json"
 WEIGHTS={
     "collateral_strength":0.25,
     "income_regularity":0.30,
-    "income_sufficienct":0.20,
+    "income_sufficiency":0.20,
     "debt_signal":0.15,
     "geographic_risk":0.10,   
 }
@@ -42,6 +42,13 @@ GRADE_QUALITIY={
     "Sim":0.50,
     "Chahar":0.30,
 }
+DISTRICTS_BY_ZONE = {
+    "terai": ["Chitwan", "Rupandehi", "Bara", "Parsa", "Morang",
+              "Sunsari", "Jhapa", "Bardiya", "Kailali", "Nawalpur"],
+    "hill": ["Kavrepalanchok", "Dhading", "Surkhet", "Kaski",
+             "Makwanpur", "Sindhupalchok", "Palpa", "Gulmi", "Syangja"],
+    "mountain": ["Solukhumbu", "Mustang", "Humla", "Mugu", "Dolpa", "Karnali"],
+}
 def score_collateral_strength(fsv:float,requested_amount:float,zone:str)->float:
     if requested_amount <= 0:
         return 0.0
@@ -51,7 +58,7 @@ def score_collateral_strength(fsv:float,requested_amount:float,zone:str)->float:
     return max(0.0, round(base - zone_discount.get(zone,0.05),4))
 
 
-def score_income_regularity(remittance_monthly:float,remittance_months_history:int,remittacne_gap_months:int,hundi:bool,coop_income_monthly:flaot,)->float:
+def score_income_regularity(remittance_monthly:float,remittance_months_history:int,remittance_gap_months:int,hundi:bool,coop_income_monthly:float,)->float:
     if remittance_monthly ==0:
         if coop_income_monthly>=30000:
             return 0.70
@@ -61,7 +68,7 @@ def score_income_regularity(remittance_monthly:float,remittance_months_history:i
             return 0.30
     if hundi:
         return HUNDI_CONFIDENCE_DISCOUNT +0.10
-    gap_forgiven =remittance_gap_monthly <= GULF_GAP_TOLERANCE_MONTHS
+    gap_forgiven =remittance_gap_months <= GULF_GAP_TOLERANCE_MONTHS
     if  remittance_months_history >= 12  and remittance_gap_months==0:
         return 1.0
     elif remittance_months_history >=6 and gap_forgiven:
@@ -88,10 +95,10 @@ def score_income_sufficiency(coop_income_monthly:float,remittance_monthly:float,
     ratio =twelve_x_capacity/requested_amount
     return min(round(ratio/2.0,4),1.0)
 
-def score_debt_signal(cib_clean:bool,existing_laons_nrs:float,micorfinance_member:bool,)->float:
+def score_debt_signal(cib_clean:bool,existing_loans_nrs:float,microfinance_member:bool,)->float:
     if not cib_clean:
         return 0.0
-    if existing_loans_nrs==0 and not micrrofinance_member:
+    if existing_loans_nrs==0 and not microfinance_member:
         return 1.0  
     if microfinance_member and existing_loans_nrs==0:
         return 0.85
@@ -302,7 +309,21 @@ def save(profiles: list[dict]) -> None:
         json.dump(output, f, indent=2, ensure_ascii=False)
     logger.info(f"Saved {len(profiles)} profiles to {OUTPUT_PATH}")
 
-    
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    profiles = generate(n_variations=494)
+    save(profiles)
+    print(f"\nDataset saved to {OUTPUT_PATH}")
+    print(f"Total profiles: {len(profiles)}")
+
+    scores = [p["expected"]["score"] for p in profiles]
+    approve = sum(1 for s in scores if s >= 65)
+    conditional = sum(1 for s in scores if 45 <= s < 65)
+    decline = sum(1 for s in scores if s < 45)
+    print(f"\nScore distribution:")
+    print(f"  Approve            : {approve}")
+    print(f"  Conditional Approve: {conditional}")
+    print(f"  Decline            : {decline}")    
     
 
                          
