@@ -143,4 +143,151 @@ def _debt_signal(cib_clean: bool,existing_loans_nrs: float,microfinance_member: 
     loan_penalty = min(existing_loans_nrs / 500_000, 0.40)
     base = 0.85 if microfinance_member else 0.80
     return round(max(0.0, base - loan_penalty), 4)    
-    
+
+def _geographic_risk(zone: str,land_type: str,land_grade: str,) -> float:
+    zone_scores = {
+        "terai":    0.88,
+        "hill":     0.62,
+        "mountain": 0.32,
+    }
+
+    land_type_adjustments = {
+        "Khet":     +0.10,
+        "Bari":     +0.00,
+        "Gharbari": -0.08,
+    }
+
+    land_grade_adjustments = {
+        "Aabal":  +0.05,
+        "Doyam":  +0.00,
+        "Sim":    -0.05,
+        "Chahar": -0.10,
+    }
+
+    base = zone_scores.get(zone, 0.62)
+    land_adj = land_type_adjustments.get(land_type, 0.0)
+    grade_adj = land_grade_adjustments.get(land_grade, 0.0)
+
+    return round(max(0.0, min(1.0, base + land_adj + grade_adj)), 4)
+
+def engineer_features(profile: dict,fsv_result: Optional[FSVResult] = None,fsv_calculator: Optional[FSVCalculator] = None,) -> FeatureVector:
+    land = profile["land"]
+    income = profile["income"]
+    credit = profile["credit"]
+    application = profile["application"]
+    zone = profile.get("zone", "hill")
+    if fsv_result is None:
+        if fsv_calculator is None:
+            fsv_calculator = FSVCalculator()
+        fsv_result = fsv_calculator.calculate(
+            district=profile["district"],
+            land_grade=land["land_grade"],
+            land_area_hectares=land["land_area_hectares"],
+            sarkaari_mool=Decimal(str(land["sarkaari_mool_nrs"])),
+            malpot_verified=land["malpot_verified"],
+        )
+
+    fsv = float(fsv_result.fsv)
+    requested = float(application["requested_amount_nrs"])
+    collateral = _collateral_strength(
+        fsv=fsv,
+        requested_amount=requested,
+        zone=zone,
+        fsv_confidence=fsv_result.confidence,
+    )
+
+    regularity, hundi_applied, gulf_gap_applied = _income_regularity(
+        remittance_monthly=income["remittance_monthly_nrs"],
+        remittance_months_history=income["remittance_months_history"],
+        remittance_gap_months=income["remittance_gap_months"],
+        hundi=income["hundi"],
+        coop_income_monthly=income["coop_income_monthly_nrs"],
+        coop_verified=income["coop_verified"],
+    )
+
+    sufficiency, effective_monthly = _income_sufficiency(
+        coop_income_monthly=income["coop_income_monthly_nrs"],
+        remittance_monthly=income["remittance_monthly_nrs"],
+        hundi=income["hundi"],
+        requested_amount=requested,
+        coop_verified=income["coop_verified"],
+    )
+
+    debt = _debt_signal(
+        cib_clean=credit["cib_clean"],
+        existing_loans_nrs=credit["existing_loans_nrs"],
+        microfinance_member=credit["microfinance_member"],
+    )
+
+    geo_risk = _geographic_risk(
+        zone=zone,
+        land_type=land["land_type"],
+        land_grade=land["land_grade"],
+    )
+
+    vector = FeatureVector(
+        collateral_strength=collateral,
+        income_regularity=regularity,
+        income_sufficiency=sufficiency,
+        debt_signal=debt,
+        geographic_risk=geo_risk,
+        hundi_applied=hundi_applied,
+        gulf_gap_applied=gulf_gap_applied,
+        fsv_confidence=fsv_result.confidence,
+        effective_monthly_income=effective_monthly,
+    )
+
+    logger.debug(
+        "Features engineered — %s: "
+        "collateral=%.3f regularity=%.3f sufficiency=%.3f "
+        "debt=%.3f geo=%.3f",
+        profile.get("farmer_name", "unknown"),
+        collateral, regularity, sufficiency, debt, geo_risk,
+    )
+
+    return vector
+def engineer_features_batch(profiles: list[dict],fsv_calculator: Optional[FSVCalculator] = None,) -> list[FeatureVector]:
+    if fsv_calculator is None:
+        fsv_calculator = FSVCalculator()
+
+    vectors = []
+    for profile in profiles:
+        vector = engineer_features(profile, fsv_calculator=fsv_calculator)
+        vectors.append(vector)
+
+    logger.info(f"Engineered features for {len(vectors)} profiles")
+    return vectors
+
+if __name__ == "__main__":
+    import json
+    from pathlib import Path
+
+    logging.basicConfig(level=logging.INFO)
+
+   
+    profiles_path = Path(__file__).parents[3] / "data" / "synthetic_profiles.json"
+    with open(profiles_path) as f:
+        profiles = json.load(f)["profiles"]
+
+    ramesh = profiles[0]  
+    calc = FSVCalculator()
+
+    vector = engineer_features(ramesh, fsv_calculator=calc)
+
+    print("\n--- Ramesh Feature Vector ---")
+    print(f"Collateral Strength : {vector.collateral_strength:.4f}")
+    print(f"Income Regularity   : {vector.income_regularity:.4f}")
+    print(f"Income Sufficiency  : {vector.income_sufficiency:.4f}")
+    print(f"Debt Signal         : {vector.debt_signal:.4f}")
+    print(f"Geographic Risk     : {vector.geographic_risk:.4f}")
+    print(f"\nHundi applied       : {vector.hundi_applied}")
+    print(f"Gulf gap applied    : {vector.gulf_gap_applied}")
+    print(f"FSV confidence      : {vector.fsv_confidence}")
+    print(f"Effective income    : NRs {vector.effective_monthly_income:,.0f}/mo")
+
+    weighted = sum(
+        vector.to_dict()[dim] * FEATURE_WEIGHTS[dim]
+        for dim in FEATURE_NAMES
+    )
+    print(f"\nWeighted score (rule-based): {weighted * 100:.2f}/100")
+    print(f"Paper expected             : 71/100")
