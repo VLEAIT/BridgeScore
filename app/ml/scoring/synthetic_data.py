@@ -158,6 +158,93 @@ def calculate_score(profile: dict, fsv: float, zone: str) -> dict:
         "dimensions": dimensions,
     }
 
+def vary_profile(anchor:dict,fsv_calculator:FSVCalculator,seed:int)->dict:
+    random.seed(seed)
+    zone=anchor["zone"]
+    district = random.choice(DISTRICTS_BY_ZONE.get(zone, DISTRICTS_BY_ZONE["hill"]))
+    land_type = random.choice(["Khet", "Bari", "Gharbari"])
+    land_grade = random.choice(["Aabal", "Doyam", "Sim", "Chahar"])
+    land_area = round(random.uniform(0.1, 2.0), 2)
+    coop_income = random.randint(2000, 50000)
+    remittance = random.randint(0, 80000)
+    hundi = random.random() < 0.35 
+    channel = "Hundi" if hundi else random.choice(["IME", "Prabhu", "None"])
+    months_history = 0 if hundi else random.randint(0, 24)
+    gap_months = random.randint(0, 6) if months_history > 0 else 0
+    cib_clean = random.random() < 0.85  
+    existing_loans = random.randint(0, 300000) if random.random() < 0.3 else 0
+    microfinance = random.random() < 0.25
+    monthly_total = coop_income + remittance
+    requested = random.randint(
+        max(50000, int(monthly_total * 3)),
+        min(1000000, int(monthly_total * 20))
+    )
+
+    malpot_verified = random.random() < 0.70 
+    tier_mool = {
+        "urban": 1500000, "semi_urban": 600000,
+        "rural": 250000, "remote": 70000
+    }
+    fsv_result = fsv_calculator.calculate(
+        district=district,
+        land_grade=land_grade,
+        land_area_hectares=land_area,
+        sarkaari_mool=Decimal(str(
+            int(tier_mool.get("rural", 250000) * land_area)
+        )),
+        malpot_verified=malpot_verified,
+    )
+
+    profile = {
+        "id": f"synthetic_{seed}",
+        "farmer_name": f"Synthetic_{seed}",
+        "district": district,
+        "zone": zone,
+        "land": {
+            "land_area_hectares": land_area,
+            "land_type": land_type,
+            "land_grade": land_grade,
+            "sarkaari_mool_nrs": int(fsv_result.sarkaari_mool),
+            "malpot_verified": malpot_verified,
+            "existing_mortgage": False,
+        },
+        "income": {
+            "coop_income_monthly_nrs": coop_income,
+            "coop_verified": random.random() < 0.80,
+            "remittance_monthly_nrs": remittance,
+            "remittance_channel": channel,
+            "remittance_months_history": months_history,
+            "remittance_gap_months": gap_months,
+            "hundi": hundi,
+            "hundi_proxy_signals": ["esewa_transactions"] if hundi else [],
+        },
+        "credit": {
+            "cib_clean": cib_clean,
+            "existing_loans_nrs": existing_loans,
+            "microfinance_member": microfinance,
+        },
+        "application": {
+            "requested_amount_nrs": requested,
+            "consent_given": True,
+        },
+    }
+
+    # calculate ground truth score
+    scoring = calculate_score(profile, float(fsv_result.fsv), zone)
+    profile["expected"] = {
+        "fsv_nrs": float(fsv_result.fsv),
+        "max_loan_nrs": float(fsv_result.max_loan_amount),
+        "score": scoring["score"],
+        "decision": scoring["decision"],
+        "dimensions": scoring["dimensions"],
+    }
+
+    return profile
+
+
+
+    
+    
 
                          
 
