@@ -288,6 +288,19 @@ def generate(n_variations: int = 494) -> list[dict]:
     )
     return all_profiles
 
+def save(profiles: list[dict]) -> None:
+    output = {
+        "_metadata": {
+            "total_profiles": len(profiles),
+            "anchor_profiles": 6,
+            "synthetic_variations": len(profiles) - 6,
+            "description": "BridgeScore XGBoost training dataset",
+        },
+        "profiles": profiles,
+    }
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+    logger.info(f"Saved {len(profiles)} profiles to {OUTPUT_PATH}")
 
     
     
