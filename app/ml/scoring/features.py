@@ -61,6 +61,12 @@ def _collateral_strength(fsv: float,requested_amount: float,zone: str,fsv_confid
 
     ratio = fsv / requested_amount
     base = min(ratio / 2.0, 1.0)
+    
+    fsv_max_loan=fsv*NRB_LTV_RATIO
+    if requested_amount > fsv_max_loan:
+        overage_ratio=requested_amount/fsv_max_loan
+        base=base / overage_ratio  
+   
 
     zone_factors = {
         "terai":    1.00,
@@ -71,7 +77,7 @@ def _collateral_strength(fsv: float,requested_amount: float,zone: str,fsv_confid
     adjusted = base * zone_factor * fsv_confidence
     return round(max(0.0, min(1.0, adjusted)), 4)  
 
-def _income_regularity(remittance_monthly: float,remittance_months_history: int,remittance_gap_months: int,hundi: bool,coop_income_monthly: float,coop_verified: bool,) -> tuple[float, bool, bool]:
+def _income_regularity(remittance_monthly: float,remittance_months_history: int,remittance_gap_months: int,hundi: bool,coop_income_monthly: float,coop_verified: bool,hundi_proxy_count:int=0) -> tuple[float, bool, bool]:
     hundi_applied = False
     gulf_gap_applied = False
     if remittance_monthly == 0 or remittance_months_history == 0:
@@ -88,7 +94,8 @@ def _income_regularity(remittance_monthly: float,remittance_months_history: int,
     if hundi:
         hundi_applied = True
         base_hundi = 1.0 - HUNDI_CONFIDENCE_DISCOUNT 
-        return min(base_hundi * 0.70, 0.50), True, False
+        proxy_bonus = min(hundi_proxy_count * 0.05, 0.15)
+        return round(min(base_hundi * 0.70 + proxy_bonus, 0.60), 4), True, False
 
     gap_forgiven = remittance_gap_months <= GULF_GAP_TOLERANCE_MONTHS
     if remittance_gap_months > 0 and gap_forgiven:
@@ -101,7 +108,7 @@ def _income_regularity(remittance_monthly: float,remittance_months_history: int,
     elif remittance_months_history >= 6 and remittance_gap_months == 0:
         score = 0.85
     elif remittance_months_history >= 6 and gulf_gap_applied:
-        score = 0.78
+        score = 0.69
     elif remittance_months_history >= 3 and gulf_gap_applied:
         score = 0.60
     elif remittance_months_history >= 3:
@@ -113,7 +120,7 @@ def _income_regularity(remittance_monthly: float,remittance_months_history: int,
 
     return round(score, 4), False, gulf_gap_applied   
 
-def _income_sufficiency(coop_income_monthly: float,remittance_monthly: float,hundi: bool,requested_amount: float,coop_verified: bool,) -> tuple[float, float]:
+def _income_sufficiency(coop_income_monthly: float,remittance_monthly: float,hundi: bool,requested_amount: float,coop_verified: bool,regularity_score:float) -> tuple[float, float]:
     effective_remittance = (
         remittance_monthly * (1.0 - HUNDI_CONFIDENCE_DISCOUNT)
         if hundi else remittance_monthly
@@ -129,15 +136,16 @@ def _income_sufficiency(coop_income_monthly: float,remittance_monthly: float,hun
     if requested_amount <= 0:
         return 0.0, total_monthly
     ratio = twelve_x_capacity / requested_amount
-    score = min(ratio / 2.0, 1.0)
+    score = min(ratio / 2.5, 1.0)
+    adjusted=score*regularity_score
 
-    return round(max(0.0, score), 4), round(total_monthly, 2)
+    return round(max(0.0, adjusted), 4), round(total_monthly, 2)
 
 def _debt_signal(cib_clean: bool,existing_loans_nrs: float,microfinance_member: bool,) -> float:
     if not cib_clean:
         return 0.0
     if existing_loans_nrs == 0 and not microfinance_member:
-        return 1.0
+        return 0.75
     if microfinance_member and existing_loans_nrs == 0:
         return 0.88
     loan_penalty = min(existing_loans_nrs / 500_000, 0.40)
@@ -203,7 +211,9 @@ def engineer_features(profile: dict,fsv_result: Optional[FSVResult] = None,fsv_c
         hundi=income["hundi"],
         coop_income_monthly=income["coop_income_monthly_nrs"],
         coop_verified=income["coop_verified"],
-    )
+        hundi_proxy_count=len(income.get("hundi_proxy_signals", [])),
+)
+    
 
     sufficiency, effective_monthly = _income_sufficiency(
         coop_income_monthly=income["coop_income_monthly_nrs"],
@@ -211,6 +221,7 @@ def engineer_features(profile: dict,fsv_result: Optional[FSVResult] = None,fsv_c
         hundi=income["hundi"],
         requested_amount=requested,
         coop_verified=income["coop_verified"],
+        regularity_score=regularity
     )
 
     debt = _debt_signal(
@@ -264,14 +275,14 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-   
     profiles_path = Path(__file__).parents[3] / "data" / "synthetic_profiles.json"
     with open(profiles_path) as f:
         profiles = json.load(f)["profiles"]
 
-    ramesh = profiles[0]  
     calc = FSVCalculator()
 
+    # --- Ramesh detailed check ---
+    ramesh = profiles[0]
     vector = engineer_features(ramesh, fsv_calculator=calc)
 
     print("\n--- Ramesh Feature Vector ---")
@@ -291,3 +302,18 @@ if __name__ == "__main__":
     )
     print(f"\nWeighted score (rule-based): {weighted * 100:.2f}/100")
     print(f"Paper expected             : 71/100")
+
+   
+    expected_scores = [71, 54, 63, 38, 84, 49]
+    names = ["Ramesh", "Sita", "Hari", "Maya", "Bir", "Ganga"]
+
+    print("\n--- All 6 Profiles ---")
+    for i, (name, expected) in enumerate(zip(names, expected_scores)):
+        v = engineer_features(profiles[i], fsv_calculator=calc)
+        computed = sum(
+            v.to_dict()[dim] * FEATURE_WEIGHTS[dim]
+            for dim in FEATURE_NAMES
+        ) * 100
+        diff = computed - expected
+        status = "approved:" if abs(diff) <= 5 else "rejected:"
+        print(f"{status} {name:10} expected={expected} computed={computed:.1f} diff={diff:+.1f}")
