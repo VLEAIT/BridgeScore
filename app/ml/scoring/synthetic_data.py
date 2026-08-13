@@ -229,7 +229,6 @@ def vary_profile(anchor:dict,fsv_calculator:FSVCalculator,seed:int)->dict:
         },
     }
 
-    # calculate ground truth score
     scoring = calculate_score(profile, float(fsv_result.fsv), zone)
     profile["expected"] = {
         "fsv_nrs": float(fsv_result.fsv),
@@ -241,6 +240,53 @@ def vary_profile(anchor:dict,fsv_calculator:FSVCalculator,seed:int)->dict:
 
     return profile
 
+def generate(n_variations: int = 494) -> list[dict]:
+
+    fsv_calculator = FSVCalculator()
+
+    with open(ANCHOR_PROFILES_PATH, "r", encoding="utf-8") as f:
+        anchors = json.load(f)["profiles"]
+
+    logger.info(f"Loaded {len(anchors)} anchor profiles")
+
+    scored_anchors = []
+    for anchor in anchors:
+        fsv_result = fsv_calculator.calculate(
+            district=anchor["district"],
+            land_grade=anchor["land"]["land_grade"],
+            land_area_hectares=anchor["land"]["land_area_hectares"],
+            sarkaari_mool=Decimal(str(anchor["land"]["sarkaari_mool_nrs"])),
+            malpot_verified=anchor["land"]["malpot_verified"],
+        )
+        scoring = calculate_score(
+            anchor, float(fsv_result.fsv), anchor["zone"]
+        )
+        anchor["computed"] = {
+            "fsv_nrs": float(fsv_result.fsv),
+            "score": scoring["score"],
+            "decision": scoring["decision"],
+            "dimensions": scoring["dimensions"],
+        }
+        scored_anchors.append(anchor)
+        logger.info(
+            f"{anchor['farmer_name']:10} → "
+            f"expected={anchor['expected']['score']} "
+            f"computed={scoring['score']} "
+            f"decision={scoring['decision']}"
+        )
+
+    variations = []
+    for i in range(n_variations):
+        anchor = anchors[i % len(anchors)]  
+        variation = vary_profile(anchor, fsv_calculator, seed=i + 100)
+        variations.append(variation)
+
+    all_profiles = scored_anchors + variations
+    logger.info(
+        f"Generated {len(all_profiles)} profiles "
+        f"({len(scored_anchors)} anchors + {len(variations)} variations)"
+    )
+    return all_profiles
 
 
     
