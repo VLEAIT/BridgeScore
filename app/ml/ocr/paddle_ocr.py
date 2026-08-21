@@ -28,7 +28,7 @@ class LalpurjaOCR:
         try:
             import easyocr
 
-            # 'hi' covers Devanagari (Hindi/Nepali script), 'en' covers digits/English text
+          
             reader = easyocr.Reader(["hi", "en"], gpu=False)
             logger.info("EasyOCR initialized successfully (CPU Mode)")
             return reader
@@ -61,7 +61,7 @@ class LalpurjaOCR:
         logger.info(f"Running EasyOCR on: {image_path}")
 
         try:
-            # reader.readtext returns: [(bbox, text, prob), ...]
+          
             raw_results = self._reader.readtext(str(path))
 
             if not raw_results:
@@ -81,7 +81,6 @@ class LalpurjaOCR:
             word_boxes = []
 
             for box, text, conf in raw_results:
-                # Convert numpy types to native python floats/lists for JSON serializability
                 clean_conf = float(conf)
                 clean_box = [[float(point[0]), float(point[1])] for point in box]
 
