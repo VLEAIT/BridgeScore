@@ -7,7 +7,7 @@ from starlette.responses import Response
 
 logger=logging.getLogger("bridgescore.http")
 
-class LoggingMiddleware(BaseHTTPMiddlware):
+class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self,request:Request,call_next)->Response:
         request_id=str(uuid.uuid4())[:8]
         logger.info(
@@ -20,7 +20,7 @@ class LoggingMiddleware(BaseHTTPMiddlware):
             duration_ms=(time.perf_counter()-start_time)*1000
             logger.info(
                 f"<- RESPONSE [{request_id}]{response.status_code}"
-                f"{request.method} {request.url.post}"
+                f"{request.method} {request.url.path}"
                 f"completed in {duration_ms:.2f}ms"
             )
             response.headers["X-Request-ID"] = request_id
