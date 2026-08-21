@@ -73,8 +73,8 @@ class ComplianceCheck(BaseModel):
     rule: NRBRule
     passed: bool
     detail: str = " "
-    actual_value=float
-    threshold_value=float
+    actual_value:float
+    threshold_value:float
 
 
 class CAOutput(BaseModel):
