@@ -23,7 +23,7 @@ class ApplicationCreate(BaseModel):
     land_type: LandType = Field(..., description="Type of the land")
     land_grade: LandGrade = Field(..., description="Grade of the land")
     coop_income_monthly: Decimal = Field(..., ge=0, description="Monthly income from the cooperative")
-    remittance_channel: RemittanceChannel = Field(default=RemittanceChannel.none, description="Channel through which remittance is received")
+    remittance_channel: RemittanceChannel = Field(default=RemittanceChannel.none_, description="Channel through which remittance is received")
     remittance_monthly: Decimal = Field(default=Decimal("0.0"), ge=0, description="Monthly remittance amount")
     requested_amount: Decimal = Field(..., gt=0, description="Requested amount for the application")
     consent_given: bool = Field(..., description="Indicates whether the farmer has given consent for data processing")
