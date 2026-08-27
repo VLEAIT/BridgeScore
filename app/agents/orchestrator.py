@@ -1,7 +1,8 @@
-# app/agents/orchestrator.py
+
 
 import logging
 import time
+from datetime import datetime,timezone
 from app.agents.state import BridgeScoreState
 
 logger = logging.getLogger("bridgescore.agents.oa")
@@ -26,15 +27,7 @@ NEPALI_TEMPLATES = {
 
 
 def oa_node(state: BridgeScoreState) -> dict:
-    """
-    Orchestrator Agent — final decision synthesis.
 
-    Reads:  credit_score, recommendation, nrb_compliant,
-            max_loan_from_fsv, recommended_max_amount,
-            dva_hard_blocks, compliance_checks
-    Writes: final_decision, approved_amount_nrs, conditions,
-            action_items, nepali_explanation, processing_time_seconds
-    """
     logger.info("OA: Synthesizing final decision")
     audit = list(state.get("audit_trail", []))
     audit.append("OA: Synthesizing final credit decision...")
@@ -48,7 +41,6 @@ def oa_node(state: BridgeScoreState) -> dict:
     conditions = []
     action_items = []
 
-    # --- hard block override ---
     if hard_blocks:
         final_decision = "Decline"
         approved_amount = 0.0
@@ -58,7 +50,6 @@ def oa_node(state: BridgeScoreState) -> dict:
         ]
         audit.append(f"OA: Hard blocks triggered Decline: {hard_blocks}")
 
-    # --- NRB non-compliant override ---
     elif not nrb_compliant:
         final_decision = "Decline"
         approved_amount = 0.0
@@ -68,7 +59,6 @@ def oa_node(state: BridgeScoreState) -> dict:
         ]
         audit.append("OA: NRB non-compliance triggered Decline")
 
-    # --- normal scoring path ---
     elif recommendation == "Approve":
         final_decision = "Approve"
         approved_amount = min(max_from_fsv, recommended_max)
@@ -77,7 +67,6 @@ def oa_node(state: BridgeScoreState) -> dict:
         final_decision = "Conditional Approve"
         approved_amount = min(max_from_fsv * 0.90, recommended_max)
 
-        # generate conditions based on soft blocks
         soft_blocks = state.get("dva_soft_blocks", [])
         if not state.get("lalpurja_verified"):
             conditions.append("Submit cooperative membership certificate")
@@ -97,7 +86,6 @@ def oa_node(state: BridgeScoreState) -> dict:
             ]
         action_items.append("Reapply after 3 months")
 
-    # --- Nepali explanation ---
     template = NEPALI_TEMPLATES.get(final_decision, NEPALI_TEMPLATES["Decline"])
     nepali_explanation = template.format(
         amount=f"{approved_amount:,.0f}",
@@ -105,8 +93,20 @@ def oa_node(state: BridgeScoreState) -> dict:
         reasons="、".join(action_items[:2]) if action_items else "स्कोर अपर्याप्त",
     )
 
-    processing_time = float(state.get("_start_time", time.time()))
-    processing_seconds = round(time.time() - processing_time, 2)
+    created_at_str=state.get("created_at")
+    if created_at_str:
+        try:
+            created_at=datetime.fromisoformat(created_at_str)
+            if created_at.tzinfo is None:
+                created_at=created_at.replace(tzinfo=timezone.utc)
+            processing_seconds=round(
+                (datetime.now(timezone.utc) - created_at).total_seconds(),2
+            )    
+
+        except Exception:
+            processing_seconds=0.0
+    else:
+        processing_seconds=0.0            
 
     audit.append(
         f"OA: Final = {final_decision} | "
