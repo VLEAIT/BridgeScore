@@ -61,6 +61,7 @@ class BridgeScoreState(TypedDict, total=False):
     action_items:           list[str] 
     nepali_explanation:     str        
     processing_time_seconds: float
+    created_at:str
 
     audit_trail:            list[str]
 
@@ -75,6 +76,7 @@ def initial_state(application: dict) -> BridgeScoreState:
         citizenship_number=application.get("citizenship_number", ""),
         phone_number=application.get("phone_number", ""),
         document_path=application.get("lalpurja_image_path"),
+        created_at=application.get("created_at",""),
 
         lalpurja_verified=False,
         malpot_cross_checked=False,
