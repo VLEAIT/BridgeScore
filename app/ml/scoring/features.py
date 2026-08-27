@@ -55,27 +55,38 @@ class FeatureVector:
             "debt_signal":         self.debt_signal,
             "geographic_risk":     self.geographic_risk,
         }
-def _collateral_strength(fsv: float,requested_amount: float,zone: str,fsv_confidence: float,) -> float:
-    if requested_amount <= 0:
+def _collateral_strength(
+    fsv: float,
+    requested_amount: float,
+    zone: str,
+    fsv_confidence: float,
+) -> float:
+    # If no valid requested amount or no collateral valuation, strength is 0
+    if requested_amount <= 0 or fsv <= 0:
+        return 0.0
+
+    fsv_max_loan = fsv * NRB_LTV_RATIO
+
+    # Prevent division by zero if NRB_LTV_RATIO is 0 or fsv_max_loan is invalid
+    if fsv_max_loan <= 0:
         return 0.0
 
     ratio = fsv / requested_amount
     base = min(ratio / 2.0, 1.0)
-    
-    fsv_max_loan=fsv*NRB_LTV_RATIO
+
     if requested_amount > fsv_max_loan:
-        overage_ratio=requested_amount/fsv_max_loan
-        base=base / overage_ratio  
-   
+        overage_ratio = requested_amount / fsv_max_loan
+        base = base / overage_ratio
 
     zone_factors = {
-        "terai":    1.00,
-        "hill":     0.92,
+        "terai": 1.00,
+        "hill": 0.92,
         "mountain": 0.75,
     }
-    zone_factor = zone_factors.get(zone, 0.92)
+    zone_factor = zone_factors.get(zone.lower(), 0.92)
     adjusted = base * zone_factor * fsv_confidence
-    return round(max(0.0, min(1.0, adjusted)), 4)  
+
+    return round(max(0.0, min(1.0, adjusted)), 4) 
 
 def _income_regularity(remittance_monthly: float,remittance_months_history: int,remittance_gap_months: int,hundi: bool,coop_income_monthly: float,coop_verified: bool,hundi_proxy_count:int=0) -> tuple[float, bool, bool]:
     hundi_applied = False

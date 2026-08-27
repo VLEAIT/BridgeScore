@@ -2,7 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.application import router as applications_router
+from app.api.applications import router as applications_router
 from app.core.config import settings
 from app.middleware.logging import LoggingMiddleware
 
@@ -38,7 +38,7 @@ app.add_middleware(LoggingMiddleware)
 if settings.allow_origins:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.allow_origins,
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
