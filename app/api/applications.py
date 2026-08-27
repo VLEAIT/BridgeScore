@@ -27,6 +27,34 @@ def create_application(payload:ApplicationCreate,db:DatabaseSession)->APIRespons
     db.commit()
     db.refresh(application)
 
+    application.status=ApplicationStatus.processing.value
+
+    try:
+        import time
+        from app.agents.state import initial_state
+        from app.agents.graph import pipeline
+        from app.core.audit import persist_pipeline_result
+
+        app_dict=payload.model_dump(mode="json")
+        app_dict["application_id"]=str(application.id)
+        app_dict["created_at"]=str(application.created_at)
+
+        state=initial_state(app_dict)
+        result=pipeline.invoke(state)
+
+        persist_pipeline_result(db, str(application.id),result)
+        db.refresh(application)
+
+
+    except Exception as e:
+        application.status=ApplicationStatus.failed.value
+        db.commit()
+        import logging
+        logging.getLogger("bridgescore").error(f"Pipeline failed for {application.id}:{e}")
+        
+
+
+
     return APIResponse(success=True,data=ApplicationOut.model_validate(application))
 
 @router.get("/",response_model=APIResponse[list[ApplicationOut]],status_code=status.HTTP_200_OK,summary="list all applications",description="Returns paginated list of all applications ")
