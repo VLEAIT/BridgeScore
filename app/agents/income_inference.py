@@ -1,4 +1,4 @@
-# app/agents/income_inference.py
+
 
 import logging
 from app.agents.state import BridgeScoreState
@@ -11,20 +11,11 @@ logger = logging.getLogger("bridgescore.agents.iia")
 
 
 def iia_node(state: BridgeScoreState) -> dict:
-    """
-    Income Inference Agent.
 
-    Reads:  coop_income_monthly, remittance_monthly, remittance_channel,
-            district, land_grade, land_area_hectares, fsv_nrs, zone
-    Writes: remittance_months_history, remittance_gap_months, hundi,
-            hundi_proxy_count, effective_monthly_income,
-            total_income_capacity, feature_vector
-    """
     logger.info("IIA: Starting income inference")
     audit = list(state.get("audit_trail", []))
     audit.append("IIA: Inferring income from cooperative and remittance channels...")
 
-    # --- fetch remittance history ---
     remittance_channel = state.get("remittance_channel", "None")
     remittance_monthly = float(state.get("remittance_monthly", 0.0))
     hundi = remittance_channel == "Hundi"
@@ -50,10 +41,9 @@ def iia_node(state: BridgeScoreState) -> dict:
             audit.append("IIA: Remittance API unreachable — using declared amount only")
 
     elif hundi:
-        hundi_proxy_count = 2  # assume basic proxy signals
+        hundi_proxy_count = 2  
         audit.append("IIA: Hundi detected — applying 35% confidence discount")
 
-    # --- build profile dict for feature engineering ---
     profile = {
         "farmer_name":  state.get("farmer_name", ""),
         "district":     state.get("district", ""),
@@ -87,7 +77,6 @@ def iia_node(state: BridgeScoreState) -> dict:
         },
     }
 
-    # --- engineer features ---
     fsv_calc = FSVCalculator()
     vector = engineer_features(profile, fsv_calculator=fsv_calc)
 
