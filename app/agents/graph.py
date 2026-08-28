@@ -1,7 +1,3 @@
-# app/agents/graph.py
-
-
-
 import logging
 from langgraph.graph import StateGraph, END
 
@@ -16,10 +12,7 @@ logger = logging.getLogger("bridgescore.agents.graph")
 
 
 def should_skip_to_oa_after_dva(state: BridgeScoreState) -> str:
-    """
-    After DVA — if hard blocks exist skip straight to OA.
-    Hard block example: Lalpurja owner name doesn't match citizenship.
-    """
+ 
     if state.get("dva_hard_blocks"):
         logger.warning(
             f"DVA hard block detected: {state['dva_hard_blocks']} — "
@@ -30,10 +23,7 @@ def should_skip_to_oa_after_dva(state: BridgeScoreState) -> str:
 
 
 def should_skip_to_oa_after_ca(state: BridgeScoreState) -> str:
-    """
-    After CA — if NRB non-compliant skip to OA.
-    CA sets nrb_compliant=False when CIB has default or score < 45.
-    """
+   
     if not state.get("nrb_compliant", True):
         logger.warning("CA: NRB non-compliant — routing directly to OA")
         return "orchestrator"
@@ -41,23 +31,18 @@ def should_skip_to_oa_after_ca(state: BridgeScoreState) -> str:
 
 
 def build_graph() -> StateGraph:
-    """
-    Build and compile the BridgeScore LangGraph pipeline.
-    Returns compiled graph ready for invocation.
-    """
+   
     graph = StateGraph(BridgeScoreState)
 
-    # --- register nodes ---
+   
     graph.add_node("document_verification", dva_node)
     graph.add_node("income_inference",      iia_node)
     graph.add_node("credit_scoring",        csa_node)
     graph.add_node("compliance",            ca_node)
     graph.add_node("orchestrator",          oa_node)
 
-    # --- entry point ---
     graph.set_entry_point("document_verification")
 
-    # --- edges with conditional routing ---
     graph.add_conditional_edges(
         "document_verification",
         should_skip_to_oa_after_dva,
@@ -85,5 +70,4 @@ def build_graph() -> StateGraph:
     return compiled
 
 
-# module-level compiled graph — import this in FastAPI
 pipeline = build_graph()
