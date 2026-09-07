@@ -4,12 +4,12 @@ from app.agents.state import initial_state
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LALPURJA_IMAGE_PATH = str(PROJECT_ROOT / "data" / "sample_lalpurja.png")
+LALPURJA_IMAGE_PATH = PROJECT_ROOT / "data" / "sample_lalpurja.png"
 
 
 def test_dva_node_with_lalpurja_image(monkeypatch) -> None:
     
-    assert Path(LALPURJA_IMAGE_PATH).exists(), f"Image file not found at: {LALPURJA_IMAGE_PATH}"
+    assert LALPURJA_IMAGE_PATH.exists(), f"Image file not found at: {LALPURJA_IMAGE_PATH}"
 
     
     def mock_verify_land_record(*args, **kwargs):
@@ -33,7 +33,7 @@ def test_dva_node_with_lalpurja_image(monkeypatch) -> None:
             "farmer_name": "Ramesh Kumar",
             "district": "Kavrepalanchok",
             "citizenship_number": "12345678",
-            "document_path": LALPURJA_IMAGE_PATH,
+            "document_path": str(LALPURJA_IMAGE_PATH),
             "land_area_hectares": 0.5,
             "land_grade": "Aabal",
             "sarkaari_mool_nrs": 516129,
