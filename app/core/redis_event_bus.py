@@ -32,7 +32,7 @@ class RedisEventBus:
     async def publish(self,stream_id:str,event:dict)->bool:
         try:
             client=self._get_client()
-            payload=json.dump(event)
+            payload=json.dumps(event)
             await client.publish(f"sse:{stream_id}",payload)
             return True
         except Exception as e:
@@ -47,21 +47,21 @@ class RedisEventBus:
             while True:
                 message =await pubsub.get_message(
                     ignore_subscribe_messages=True,
-                    timeone=1.0
+                    timeout=1.0
                 )    
-                if message and message["typo"]=="message":
+                if message and message["type"]=="message":
                     data=json.loads(message["data"])
                     if data.get("__signal__")=="close":
                         break
                     yield data
 
-                    await asyncio.sleep(0.01)
+                await asyncio.sleep(0.01)
         finally:
             await  pubsub.unsubscribe(f"sse:{stream_id}")
             await pubsub.close()        
 
     async def close(self,stream_id:str):
-        await self.pulish(stream_id,{"__signal__":"close"})
+        await self.publish(stream_id,{"__signal__":"close"})
 
 redis_event_bus=RedisEventBus()
 
