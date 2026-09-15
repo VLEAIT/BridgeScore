@@ -1,5 +1,5 @@
 import asyncio,logging
-from typing import Optional
+from typing import Optional,Dict,Any
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +32,25 @@ class EventBus:
             except Exception:
                 pass
             return False    
+    async def listen(self,stream_id:str)->AsyncGenerator(Dict[str,Any],None):
+        q =self.get(stream_id)
+        if not q:
+            q = self.create(stream_id)
+        try:
+            while True:
+                event=await q.get()
+                if event is None or event.get("__signal__")=="close":
+                    break
+                yield event
+        finally:
+            await q.close(stream_id)        
 
     async def close(self, stream_id:str):
         q=self._queues.get(stream_id)
         if q:
-            q.put_nowait(None)  
-            del self._queues[stream_id]
+            q.put_nowait({"__signal__":"close"})
+            self._queues.pop(stream_id,None)
+       
 
     def active_streams(self)->list[str]:
         return list(self._queues.keys())
