@@ -38,7 +38,7 @@ class RedisEventBus:
         except Exception as e:
             logger.error(f"Failed to publish event to Redis from stream {stream_id}:{e}")  
             return False      
-    async def listen(self,stream_id:str)->AsyncGenerator[dict,None]:
+    async def listen(self,stream_id:str)->AsyncGenerator[[dict,None],None]:
         client=self._get_client()
         pubsub=client.pubsub() 
         await pubsub.subscribe(f"sse:{stream_id}")   
