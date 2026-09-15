@@ -32,7 +32,7 @@ class EventBus:
             except Exception:
                 pass
             return False    
-    async def listen(self,stream_id:str)->AsyncGenerator(Dict[str,Any],None):
+    async def listen(self,stream_id:str)->AsyncGenerator[Dict[str,Any],None]:
         q =self.get(stream_id)
         if not q:
             q = self.create(stream_id)
