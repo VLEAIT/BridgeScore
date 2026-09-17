@@ -1,5 +1,6 @@
 import asyncio,logging
 from typing import Optional,Dict,Any
+from collections.abc import AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class EventBus:
                     break
                 yield event
         finally:
-            await q.close(stream_id)        
+            await self.close(stream_id)        
 
     async def close(self, stream_id:str):
         q=self._queues.get(stream_id)
